@@ -10,6 +10,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .client import SwegonCasaClient
 from .const import (
     DOMAIN,
+    ID_HUMIDITY_GM3,
     ID_SET_MODE,
     MODE_MAPPINGS,
     SENSOR_CONFIG,
@@ -77,7 +78,7 @@ class SwegonCasaSensor(SensorEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated",
+                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
                 self._handle_data_update,
             )
         )
@@ -89,6 +90,9 @@ class SwegonCasaSensor(SensorEntity):
 
         if self.sensor_id in data:
             value = data[self.sensor_id]
+
+            if self.sensor_id == ID_HUMIDITY_GM3:
+                value = round(float(value) / 10, 2)
 
             if self.sensor_id == ID_SET_MODE:
                 value = MODE_MAPPINGS.get(str(value), f"Unknown({value})")

@@ -53,7 +53,7 @@ class SwegonCasaSupplyTemperatureSetpoint(NumberEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated",
+                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
                 self._handle_data_update,
             )
         )

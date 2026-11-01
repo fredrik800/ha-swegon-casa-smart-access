@@ -63,7 +63,7 @@ class SwegonCasaClimateSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated",
+                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
                 self._handle_data_update,
             )
         )
@@ -126,7 +126,7 @@ class SwegonCasaFireplaceModeSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated",
+                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
                 self._handle_data_update,
             )
         )
@@ -191,7 +191,7 @@ class SwegonCasaTravelModeSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated",
+                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
                 self._handle_data_update,
             )
         )
@@ -254,7 +254,7 @@ class SwegonCasaAutoHumidityControlSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated",
+                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
                 self._handle_data_update,
             )
         )
@@ -319,7 +319,7 @@ class SwegonCasaSummerNightCoolingSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated",
+                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
                 self._handle_data_update,
             )
         )

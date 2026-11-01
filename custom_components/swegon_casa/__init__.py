@@ -49,7 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 data = await client.fetch_data()
                 if data:
                     hass.bus.async_fire(
-                        f"{DOMAIN}_data_updated",
+                        f"{DOMAIN}_data_updated_{host.replace('.', '_')}",
                         {"data": data},
                     )
             except Exception as err:

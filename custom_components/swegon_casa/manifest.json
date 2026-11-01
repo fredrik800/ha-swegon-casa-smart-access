@@ -1,12 +1,16 @@
 {
   "domain": "swegon_casa",
   "name": "Swegon Casa Smart Access",
-  "codeowners": ["@TMschar"],
+  "codeowners": [
+    "@TMschar"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/TMschar/ha-swegon-casa-smart-access",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/TMschar/ha-swegon-casa-smart-access/issues",
-  "requirements": ["aiohttp>=3.8.0"],
-  "version": "1.0.0",
+  "requirements": [
+    "aiohttp>=3.8.0"
+  ],
+  "version": "1.0.1",
   "homeassistant": "2023.12.0"
 }
