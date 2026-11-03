@@ -9,11 +9,19 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .client import SwegonCasaClient
-from .const import DOMAIN, data_updated_event
+from .const import (
+    CONF_AFTERHEATER_WATTS,
+    DOMAIN,
+    data_updated_event,
+)
+from .energy import SwegonCasaEnergyTracker
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR, Platform.NUMBER, Platform.SELECT, Platform.CLIMATE]
+PLATFORMS = [
+    Platform.SENSOR, Platform.NUMBER, Platform.SELECT,
+    Platform.CLIMATE, Platform.BUTTON,
+]
 
 
 async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -41,7 +49,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.error("Error during login: %s", err)
         return False
 
-    hass.data[DOMAIN][entry.entry_id] = {"client": client}
+    tracker = SwegonCasaEnergyTracker(
+        hass, entry.entry_id, entry.options.get(CONF_AFTERHEATER_WATTS, 0)
+    )
+    await tracker.async_load()
+    hass.data[DOMAIN][entry.entry_id] = {
+        "client": client,
+        "energy_tracker": tracker,
+    }
     entry.async_on_unload(entry.add_update_listener(async_update_options))
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -52,6 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             try:
                 data = await client.fetch_data()
                 if data is not None:
+                    tracker.process_reading(data)
                     hass.bus.async_fire(
                         data_updated_event(entry.entry_id),
                         {"data": data},
@@ -79,4 +95,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 await task
             except asyncio.CancelledError:
                 pass
+        tracker = data.get("energy_tracker")
+        if tracker is not None:
+            await tracker.async_save()
     return unloaded

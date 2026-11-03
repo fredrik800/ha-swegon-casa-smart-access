@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-11-03
+
+### Added
+- Persistent per-unit afterheater energy total (kWh), suitable for HA Energy Dashboard.
+- Rolling last-30-days estimated afterheater energy (kWh), stored in five-minute bins.
+- Per-unit button to reset both the lifetime total and all 30-day history.
+
+### Behavior
+- Estimates energy from the previous afterheater percentage, configured heater
+  wattage, and elapsed time between valid samples (typically 30 seconds).
+- Counter and rolling history survive Home Assistant restarts and integration reloads.
+- Gaps longer than 120 seconds are skipped rather than estimated; downtime is not counted.
+- History starts when v1.0.3 is installed and cannot recover past energy use.
+- Automatic saves every five minutes, plus saves on clean integration unload.
+- Changing the configured wattage affects future energy only; reset both counters
+  if you want to restart after recalibration.
+- The 30-day rolling window is approximated with five-minute UTC bins.
+
 ## [1.0.2] - 2026-11-03
 
 ### Added

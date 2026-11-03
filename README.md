@@ -2,6 +2,27 @@
 
 > This repository is a fork of [TMschar/ha-swegon-casa-smart-access](https://github.com/TMschar/ha-swegon-casa-smart-access). Version **1.0.2** adds experimental calculated sensors and per-unit configuration. Thanks to the original author; this fork is not an official Swegon integration.
 
+## Fork v1.0.3: afterheater energy tracking
+
+The integration now adds three entities for each configured CASA unit:
+
+- **FTX Total Energy Consumption** (kWh): persistent lifetime estimated energy.
+  This is a `total_increasing` sensor usable in the Home Assistant Energy Dashboard.
+- **FTX Last 30 Days Energy** (kWh): rolling 30-day estimate, stored in
+  five-minute bins and updated as the window moves.
+- **FTX Reset Energy Consumption**: resets *both* counters and the full
+  30-day history for the selected unit only.
+
+Energy is calculated from the last valid afterheater percentage multiplied by
+the configured rated heater wattage and the elapsed time between readings.
+It is **an estimate**, not metered electrical energy. Gaps over two minutes,
+including HA outages, are not extrapolated. Counters are saved to HA storage
+every five minutes and on a clean integration unload; sudden power loss may
+lose up to approximately five minutes of measurements. History begins when
+this feature is installed; older consumption cannot be reconstructed.
+A change to heater wattage applies only to future readings. Reset both
+counters if you recalibrate and want a fresh baseline.
+
 ## Fork v1.0.2: afterheater and estimated fan RPM
 
 - **Afterheater control (%)** from local API object 38 (verified on R5).

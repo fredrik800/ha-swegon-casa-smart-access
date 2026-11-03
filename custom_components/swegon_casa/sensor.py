@@ -1,14 +1,17 @@
 """Sensor platform for Swegon Casa."""
 
+from datetime import timedelta
 from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfPower
+from homeassistant.const import UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_track_time_interval
 
 from .client import SwegonCasaClient
+from .energy import SwegonCasaEnergyTracker, energy_updated_event
 from .const import (
     CONF_AFTERHEATER_WATTS,
     CONF_EXHAUST_MAX_RPM,
@@ -62,6 +65,11 @@ async def async_setup_entry(
             ID_VENTILATION_LEVEL_OUT, entry.options.get(CONF_EXHAUST_MAX_RPM, 0),
             "RPM", "mdi:fan", None,
         ),
+    ])
+    tracker: SwegonCasaEnergyTracker = data["energy_tracker"]
+    sensors.extend([
+        SwegonCasaEnergySensor(hass, entry.entry_id, tracker, rolling=False),
+        SwegonCasaEnergySensor(hass, entry.entry_id, tracker, rolling=True),
     ])
     async_add_entities(sensors)
 
@@ -184,4 +192,75 @@ class SwegonCasaCalculatedSensor(SensorEntity):
             except (ValueError, TypeError):
                 self._attr_available = False
                 self._attr_native_value = None
+        self.async_write_ha_state()
+
+
+class SwegonCasaEnergySensor(SensorEntity):
+    """Estimated heater energy, either cumulative or rolling 30 days."""
+
+    _attr_has_entity_name = True
+    _attr_device_class = SensorDeviceClass.ENERGY
+    _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
+
+    def __init__(
+        self, hass: HomeAssistant, entry_id: str,
+        tracker: SwegonCasaEnergyTracker, rolling: bool,
+    ) -> None:
+        self.hass = hass
+        self.entry_id = entry_id
+        self.tracker = tracker
+        self.rolling = rolling
+        self._attr_unique_id = (
+            f"{DOMAIN}_{entry_id}_energy_30_days"
+            if rolling
+            else f"{DOMAIN}_{entry_id}_energy_total"
+        )
+        self._attr_name = (
+            "FTX Last 30 Days Energy"
+            if rolling
+            else "FTX Total Energy Consumption"
+        )
+        self._attr_icon = "mdi:calendar-month" if rolling else "mdi:counter"
+        if not rolling:
+            self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        # Rolling-window energy can decrease and must not be used as a
+        # total_increasing energy dashboard source.
+
+    @property
+    def available(self) -> bool:
+        """Require a configured rated heater wattage."""
+        return self.tracker.heater_watts > 0
+
+    @property
+    def native_value(self) -> float:
+        """Return energy in kWh with 0.001 kWh display resolution."""
+        value = (
+            self.tracker.last_30_days_kwh()
+            if self.rolling
+            else self.tracker.total_kwh
+        )
+        return round(value, 3)
+
+    async def async_added_to_hass(self) -> None:
+        """Refresh after samples and reset; roll the window every 5 min."""
+        self.async_on_remove(
+            self.hass.bus.async_listen(
+                data_updated_event(self.entry_id), self._handle_update
+            )
+        )
+        self.async_on_remove(
+            self.hass.bus.async_listen(
+                energy_updated_event(self.entry_id), self._handle_update
+            )
+        )
+        if self.rolling:
+            self.async_on_remove(
+                async_track_time_interval(
+                    self.hass, self._handle_update, timedelta(minutes=5)
+                )
+            )
+
+    @callback
+    def _handle_update(self, _event: Any) -> None:
+        """Write a new sensor state."""
         self.async_write_ha_state()
