@@ -141,9 +141,14 @@ class SwegonCasaEnergyTracker:
         for bucket, energy in self.buckets.items():
             start = bucket * BUCKET_SECONDS
             end = start + BUCKET_SECONDS
-            overlap = max(0.0, min(end, timestamp) - max(start, cutoff))
-            if overlap:
-                result += energy * overlap / BUCKET_SECONDS
+            if start > timestamp or end <= cutoff:
+                continue
+            if start < cutoff:
+                # Only the oldest, partly expired bucket needs interpolation.
+                result += energy * (end - cutoff) / BUCKET_SECONDS
+            else:
+                # Current bucket is already partial; do not scale it again.
+                result += energy
         return result
 
     def _serialize(self) -> dict[str, Any]:
