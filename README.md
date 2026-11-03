@@ -1,5 +1,24 @@
 # Swegon Casa Home Assistant Integration
 
+> This repository is a fork of [TMschar/ha-swegon-casa-smart-access](https://github.com/TMschar/ha-swegon-casa-smart-access). Version **1.0.2** adds experimental calculated sensors and per-unit configuration. Thanks to the original author; this fork is not an official Swegon integration.
+
+## Fork v1.0.2: afterheater and estimated fan RPM
+
+- **Afterheater control (%)** from local API object 38 (verified on R5).
+- **Estimated heater power (W)**: afterheater percentage multiplied by rated heater wattage (e.g. R2 400 W, R5 800 W).
+- **Estimated supply/exhaust fan RPM**, calculated from the respective fan percentages and user-supplied RPM at 100% and rounded to 100 RPM steps. These are **not measured RPM**.
+- **Options per device**: change IP address and calibrate rated heater watts and fan RPM independently for each Swegon unit.
+- Preserves the **v1.0.1** multi-unit isolation and absolute humidity scaling fix.
+- Unverified API object 27 is no longer labelled as RPM; Home Assistant may prompt to clean up historical statistics for this legacy sensor.
+
+### Install this fork via HACS
+
+Add `https://github.com/fredrik800/ha-swegon-casa-smart-access` as a **custom repository** of type **Integration** in HACS, then install the fork and restart Home Assistant. Avoid installing the upstream integration alongside this fork because both use the same `swegon_casa` domain. Back up `/config/custom_components/swegon_casa/` and your HA configuration before switching.
+
+After installation, open **Settings > Devices & services > Swegon Casa > Configure** on each unit and set its wattage/RPM calibration. A value of 0 makes the corresponding calculated sensor unavailable until calibrated.
+
+
+
 [![GitHub Release](https://img.shields.io/github/release/TMschar/ha-swegon-casa-smart?style=flat-square)](https://github.com/TMschar/ha-swegon-casa-smart/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/TMschar/ha-swegon-casa-smart/total?style=flat-square)](https://github.com/TMschar/ha-swegon-casa-smart)
 [![HACS Badge](https://img.shields.io/badge/HACS-default-41BDF5?style=flat-square)](https://github.com/hacs/integration)

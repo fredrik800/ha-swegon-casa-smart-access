@@ -185,6 +185,7 @@ class SwegonCasaClient:
                 "28",
                 "29",
                 "31",
+                "38",  # Afterheater output percent
                 "121",
                 "163",
                 "111",

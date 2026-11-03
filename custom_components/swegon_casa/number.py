@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .client import SwegonCasaClient
-from .const import DOMAIN
+from .const import DOMAIN, data_updated_event
 from .lib import SwegonObjectId
 
 
@@ -45,6 +45,7 @@ class SwegonCasaSupplyTemperatureSetpoint(NumberEntity):
         """Initialize the number entity."""
         self.hass = hass
         self.client = client
+        self.entry_id = entry_id
         self._attr_name = "Supply Temperature Setpoint"
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_supply_temperature_setpoint"
         self._attr_native_value = 20.0
@@ -53,13 +54,13 @@ class SwegonCasaSupplyTemperatureSetpoint(NumberEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
+                data_updated_event(self.entry_id),
                 self._handle_data_update,
             )
         )
 
     @callback
-    async def _handle_data_update(self, event: Any) -> None:
+    def _handle_data_update(self, event: Any) -> None:
         """Handle data update event."""
         data = event.data.get("data", {})
         setpoint_temp = data.get(str(SwegonObjectId.SETPOINT_SUPPLY_TEMPERATURE))

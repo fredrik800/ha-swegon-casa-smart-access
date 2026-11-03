@@ -1,0 +1,42 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Swegon Casa Smart Access Module",
+        "description": "Enter your Swegon Casa Smart Access Module credentials",
+        "data": {
+          "username": "Email",
+          "password": "Password",
+          "host": "IP address or hostname"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid credentials",
+      "invalid_host": "Enter an IP address or hostname",
+      "cannot_connect": "Cannot connect to the unit"
+    },
+    "abort": {
+      "already_configured": "This unit is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Unit settings and calculated sensors",
+        "description": "Settings apply to this unit only. Enter 0 if unknown (sensor becomes unavailable). Fan RPM is estimated, not measured.",
+        "data": {
+          "host": "IP address or hostname",
+          "afterheater_watts": "Afterheater maximum power (W)",
+          "supply_max_rpm": "Supply fan estimated RPM at 100%",
+          "exhaust_max_rpm": "Exhaust fan estimated RPM at 100%"
+        }
+      }
+    },
+    "error": {
+      "invalid_host": "Enter an IP address or hostname",
+      "already_configured": "Another unit already uses this IP address",
+      "cannot_connect": "Could not connect with saved credentials"
+    }
+  }
+}

@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .client import SwegonCasaClient
-from .const import DOMAIN
+from .const import DOMAIN, data_updated_event
 from .lib import (
     AutoHumidityControlModes,
     ClimateModes,
@@ -54,6 +54,7 @@ class SwegonCasaClimateSelect(SelectEntity):
         """Initialize the select entity."""
         self.hass = hass
         self.client = client
+        self.entry_id = entry_id
         self._attr_name = "Climate Mode"
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_climate_mode"
         self._attr_current_option = ClimateModes.HOME
@@ -63,13 +64,13 @@ class SwegonCasaClimateSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
+                data_updated_event(self.entry_id),
                 self._handle_data_update,
             )
         )
 
     @callback
-    async def _handle_data_update(self, event: Any) -> None:
+    def _handle_data_update(self, event: Any) -> None:
         """Handle data update event."""
         data = event.data.get("data", {})
         climate_mode_value = data.get(str(SwegonObjectId.CLIMATE_MODE))
@@ -117,6 +118,7 @@ class SwegonCasaFireplaceModeSelect(SelectEntity):
         """Initialize the select entity."""
         self.hass = hass
         self.client = client
+        self.entry_id = entry_id
         self._attr_name = "Fireplace Mode"
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_fireplace_mode"
         self._attr_current_option = FireplaceModes.OFF
@@ -126,13 +128,13 @@ class SwegonCasaFireplaceModeSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
+                data_updated_event(self.entry_id),
                 self._handle_data_update,
             )
         )
 
     @callback
-    async def _handle_data_update(self, event: Any) -> None:
+    def _handle_data_update(self, event: Any) -> None:
         """Handle data update event."""
         data = event.data.get("data", {})
         fireplace_mode_value = data.get(str(SwegonObjectId.FIREPLACE_MODE))
@@ -181,6 +183,7 @@ class SwegonCasaTravelModeSelect(SelectEntity):
         """Initialize the select entity."""
         self.hass = hass
         self.client = client
+        self.entry_id = entry_id
         self._attr_name = "Travel Mode"
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_travel_mode"
         self._attr_current_option = TravelModes.OFF
@@ -191,13 +194,13 @@ class SwegonCasaTravelModeSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
+                data_updated_event(self.entry_id),
                 self._handle_data_update,
             )
         )
 
     @callback
-    async def _handle_data_update(self, event: Any) -> None:
+    def _handle_data_update(self, event: Any) -> None:
         """Handle data update event."""
         data = event.data.get("data", {})
         travel_mode_value = data.get(str(SwegonObjectId.TRAVEL_MODE))
@@ -245,6 +248,7 @@ class SwegonCasaAutoHumidityControlSelect(SelectEntity):
         """Initialize the select entity."""
         self.hass = hass
         self.client = client
+        self.entry_id = entry_id
         self._attr_name = "Auto Humidity Control Mode"
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_auto_humidity_control_mode"
         self._attr_current_option = AutoHumidityControlModes.OFF
@@ -254,13 +258,13 @@ class SwegonCasaAutoHumidityControlSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
+                data_updated_event(self.entry_id),
                 self._handle_data_update,
             )
         )
 
     @callback
-    async def _handle_data_update(self, event: Any) -> None:
+    def _handle_data_update(self, event: Any) -> None:
         """Handle data update event."""
         data = event.data.get("data", {})
         humidity_mode_value = data.get(str(SwegonObjectId.AUTO_HUMIDITY_CONTROL_MODE))
@@ -310,6 +314,7 @@ class SwegonCasaSummerNightCoolingSelect(SelectEntity):
         """Initialize the select entity."""
         self.hass = hass
         self.client = client
+        self.entry_id = entry_id
         self._attr_name = "Summer Night Cooling Mode"
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_summer_night_cooling_mode"
         self._attr_current_option = SummerNightCoolingModes.OFF
@@ -319,13 +324,13 @@ class SwegonCasaSummerNightCoolingSelect(SelectEntity):
         """When entity is added to hass."""
         self.async_on_remove(
             self.hass.bus.async_listen(
-                f"{DOMAIN}_data_updated_{self.client.host.replace('.', '_')}",
+                data_updated_event(self.entry_id),
                 self._handle_data_update,
             )
         )
 
     @callback
-    async def _handle_data_update(self, event: Any) -> None:
+    def _handle_data_update(self, event: Any) -> None:
         """Handle data update event."""
         data = event.data.get("data", {})
         cooling_mode_value = data.get(str(SwegonObjectId.SUMMER_NIGHT_COOLING_MODE))

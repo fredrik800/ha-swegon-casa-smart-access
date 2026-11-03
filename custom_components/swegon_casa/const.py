@@ -5,6 +5,16 @@ from typing import Any
 
 DOMAIN = "swegon_casa"
 
+# Per-config-entry calibration; each unit has independent settings.
+CONF_AFTERHEATER_WATTS = "afterheater_watts"
+CONF_SUPPLY_MAX_RPM = "supply_max_rpm"
+CONF_EXHAUST_MAX_RPM = "exhaust_max_rpm"
+
+
+def data_updated_event(entry_id: str) -> str:
+    """Keep readings from different Swegon units isolated."""
+    return f"{DOMAIN}_{entry_id}_data_updated"
+
 ID_TEMPERATURE_SUPPLY = "17"
 ID_TEMPERATURE_ROOM = "18"
 ID_TEMPERATURE_OUTSIDE = "19"
@@ -14,6 +24,7 @@ ID_CURRENT_FAN_SPEED = "27"
 ID_VENTILATION_LEVEL_IN = "28"
 ID_VENTILATION_LEVEL_OUT = "29"
 ID_BOOST_COUNT_DOWN = "31"
+ID_AFTERHEATER_PERCENT = "38"  # Confirmed as heater control percent on R5.
 TRAVELLING_MODE_TEMPERATURE_DROP = "121"
 ID_SETPOINT_SUPPLY_TEMPERATURE = "163"
 
@@ -94,10 +105,11 @@ SENSOR_CONFIG: dict[str, dict[str, Any]] = {
     },
     ID_CURRENT_FAN_SPEED: {
         "key": "fan_speed",
-        "name": "FTX Fan Speed",
+        "name": "FTX Fan Speed (unverified API value)",
         "device_class": None,
-        "unit_of_measurement": "RPM",
-        "state_class": "measurement",
+        # API ID 27 returned 2; this is not a verified fan RPM reading.
+        "unit_of_measurement": None,
+        "state_class": None,
         "icon": "mdi:fan",
     },
     ID_VENTILATION_LEVEL_IN: {
@@ -123,6 +135,14 @@ SENSOR_CONFIG: dict[str, dict[str, Any]] = {
         "unit_of_measurement": "min",
         "state_class": "measurement",
         "icon": "mdi:timer",
+    },
+    ID_AFTERHEATER_PERCENT: {
+        "key": "afterheater_percent",
+        "name": "FTX Eftervärme effekt",
+        "device_class": None,
+        "unit_of_measurement": "%",
+        "state_class": "measurement",
+        "icon": "mdi:radiator",
     },
     TRAVELLING_MODE_TEMPERATURE_DROP: {
         "key": "travel_temp_drop",

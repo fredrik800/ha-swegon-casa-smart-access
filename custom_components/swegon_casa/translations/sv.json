@@ -1,0 +1,42 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Anslut Swegon CASA Smart Access",
+        "description": "Ange aggregatets IP-adress och inloggningsuppgifter",
+        "data": {
+          "host": "IP-adress eller värdnamn",
+          "username": "E-post/användarnamn",
+          "password": "Lösenord"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Felaktiga inloggningsuppgifter",
+      "invalid_host": "Ange en IP-adress eller ett värdnamn",
+      "cannot_connect": "Kunde inte ansluta till aggregatet"
+    },
+    "abort": {
+      "already_configured": "Aggregatet är redan konfigurerat"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Aggregatets inställningar och beräknade sensorer",
+        "description": "Inställningarna gäller endast detta aggregat. Ange 0 för okänt värde; då blir sensorn otillgänglig. Fläktvarvtalen är uppskattningar, inte uppmätta värden.",
+        "data": {
+          "host": "IP-adress eller värdnamn",
+          "afterheater_watts": "Eftervärmarens maxeffekt (W)",
+          "supply_max_rpm": "Tilluftsfläktens uppskattade RPM vid 100 %",
+          "exhaust_max_rpm": "Frånluftsfläktens uppskattade RPM vid 100 %"
+        }
+      }
+    },
+    "error": {
+      "invalid_host": "Ange en IP-adress eller ett värdnamn",
+      "already_configured": "IP-adressen används redan av ett annat aggregat",
+      "cannot_connect": "Kunde inte ansluta med sparade inloggningsuppgifter"
+    }
+  }
+}
